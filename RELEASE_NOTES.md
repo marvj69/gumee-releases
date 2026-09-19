@@ -1,3 +1,26 @@
+# gumee 0.3.0 — macOS Apple Silicon
+
+- Saved-workbook recalculation catches the audit's wrong formulas and misleading cached totals.
+- Native document tables, supported chart/image structures, saved-file renders, persistent checks,
+  approved canonical replacements and version restore.
+- Domain-constrained research with fetched source evidence and practical fallback search.
+- Awaiting-input and partial-completion states, deterministic finish, selected fresh context,
+  cumulative reservations across retries, media, summaries and bounded subtasks.
+- Scoped Google OAuth/API adapters, selected project knowledge and reviewed file changes.
+- Bundled isolated Python, offline interactive previews, provider image/transcription tools and
+  local audio/video processing.
+- Deployable opt-in remote worker/shared-project service, migration backups and verified signed
+  updater mechanism. Live hosting, Google registration, Apple signing/notarization and update
+  hosting require external setup; this Mac build is unsigned and not notarized.
+
+The Mac package passed 317 unit/integration tests and 18 desktop journeys. Provider video
+analysis remains unverified live. Windows and Linux downloads remain at version 0.2.1.
+
+Google live account acceptance, hosted remote/multi-device acceptance and a signed update feed remain setup gates. Local video tools work; provider video analysis has not passed live acceptance. No computer control or authenticated browser automation is included.
+
+Install using the DMG or ZIP below. Verify the download against SHA256SUMS.txt. Close Gumee and back up its data directory before upgrading; see [installation instructions](https://github.com/marvj69/gumee-releases/blob/main/INSTALL.md).
+
+
 # gumee 0.2.1
 
 - Attach JPEG, PNG, WebP, GIF, BMP, and TIFF images and read their text with local English OCR.

@@ -1,11 +1,11 @@
-# Installing and using gumee 0.2.0
+# Installing and using gumee 0.3.0
 
 gumee is a free desktop app. Models use your OpenRouter account and are billed by OpenRouter.
 An installed app does not require Node, Python, Docker, Git, or a local model.
 
 ## Install
 
-Use the artifacts actually listed on the repository's release page. The configured targets are:
+Version 0.3.0 is available for macOS Apple Silicon. Windows and Linux remain at 0.2.1; the 0.3.0 features below apply to the Mac release. Use the artifacts actually listed on each release page. The configured targets are:
 
 | Platform | Artifact pattern |
 | --- | --- |
@@ -29,7 +29,7 @@ with the entry for that exact artifact.
 
 Builds without signing credentials are unsigned and may be blocked by platform security
 checks. A local successful build does not imply Apple notarization or Windows signing. Read
-the artifact's stated signing status, or build from source using [README.md](README.md).
+the artifact's stated signing status, and see [release notes](RELEASE_NOTES.md) for tested platforms and remaining setup.
 
 ## Connect your model account
 
@@ -51,7 +51,7 @@ icon beside it selects a folder and copies supported files into the task: up to 
 are snapshots, not a live synchronized folder. Later changes to the original files are not
 picked up automatically.
 
-Supported inputs are TXT, Markdown, CSV, JSON, PDF, DOCX, XLSX, PPTX, and JPEG/PNG/WebP/GIF/BMP/TIFF images. Scanned PDF pages and image text are read with bundled local English OCR; no separate key or language download is needed. Recognized text is sent to your selected model as document context. OCR can misread handwriting, names, and numbers and does not interpret photographs or diagrams. For long scans, ask for batches of up to 20 pages. HEIC images must first be exported as JPEG or PNG.
+Supported inputs are TXT, Markdown, CSV, JSON, PDF, DOCX, XLSX, PPTX, and JPEG/PNG/WebP/GIF/BMP/TIFF images. Scanned PDF pages and image text are read with bundled local English OCR; no separate key or language download is needed. Recognized text is sent to your selected model as document context. OCR can misread handwriting, names, and numbers and does not interpret photographs or diagrams. For visual questions, the agent uses view_image to send PNG/JPEG/WebP/GIF pixels to your selected model through OpenRouter. Enable Document tools and choose a model that supports image input. Image viewing is limited to 25 MB and 40 megapixels, resized to a maximum 2048-pixel edge; animated GIFs use the first frame. Image pixels are retained in local conversation checkpoints for follow-ups. For long scans, ask for batches of up to 20 pages. HEIC images must first be exported as JPEG or PNG.
 
 Press **Run** or **⌘/Ctrl+Enter**. Expand activity entries to inspect actual tool arguments and
 results. The **Plan** panel shows agent-written steps, run ceilings, costs, checkpoint time,
@@ -83,7 +83,7 @@ Settings → **Long-running tasks** controls:
 | Budget | $5 per run | $0.01–$100 |
 | Concurrent runs | 2 | 1–4 |
 
-The Effort slider scales steps/time; it leaves the budget unchanged. These settings govern
+The Effort slider scales requests/time; it leaves the budget unchanged. These settings govern
 new runs. A 24-hour setting is an allowed ceiling, not evidence of a 24-hour reliability test.
 Provider-reported charges and estimates can differ. OpenRouter account/key limits provide the
 provider-side spending control. Waiting for approval or manually paused work is not active
@@ -125,29 +125,56 @@ MCP tools to make it available. Each tool invocation shows the service, operatio
 for **Allow** or **Decline**. OAuth login, local stdio servers, private-network endpoints, and a
 preconfigured application catalog are not supported in this release.
 
+## Added workflows in 0.3.0
+
+Settings includes Google account setup, selected projects, a Python test panel, signed-update
+setup, and optional remote work/shared projects. Each shows its actual configured state.
+
+- Google: register a desktop OAuth client, enter its ID in Settings, choose only needed scopes,
+  and link an account. Exact setup and supported operations (available in the source repository).
+- Projects: choose a folder, refresh its bounded text index, search it, and assign new tasks to
+  it. Task, project and global instructions are separate. Changes preserve source backups and
+  require review; switching project access after a task has run is refused.
+- Python: offline runtime is bundled in the Mac app. No Python installation, shell, pip or
+  Docker is needed. NumPy, pandas, matplotlib and Pillow are pinned; 60 seconds/256 MiB WASM.
+- Media: enable artifact/document tools, ask for the operation, and review the selected model,
+  provider and maximum charge before paid image/transcription work. Unsupported pricing or
+  codecs are blocked. See media workflows (available in the source repository).
+- Remote: configure your own HTTPS worker and account token, explicitly select transfer files,
+  review the job/budget, then submit. Local files/accounts are not silently uploaded or made
+  available remotely. Shared projects use owner/editor/viewer roles and revision conflicts.
+
 ## File and tool limits
 
-- Office inputs provide extracted text/data. XLSX formulas use stored results; gumee does not
-  recalculate them. Charts, images, slide notes, and visual layout are not fully extracted.
-- Generated DOCX/XLSX/PPTX/PDF files are real files created from structured content. They do not
-  preserve every feature of an arbitrary source template. Spreadsheet formula results need
-  verification in a spreadsheet application.
-- PDF text replacement supports a defined subset of text-based PDFs. It is not OCR, a general
-  page-layout editor, or support for all fonts and encodings.
-- Public HTTPS research does not sign into websites, click forms, or inspect pages visually.
-- JavaScript calculations run with a 32 MB interpreter limit and a short execution deadline.
-  There is no arbitrary shell, Python, package installation, or access to desktop apps.
+Saved-file reports distinguish creation, reopen, structure, calculation, rendering, model visual
+review and source consistency. Expand the output's checks and view rendered pages. A valid file
+without a source expectation is not certified as factually correct. Repairs replace the canonical
+filename only after overwrite approval and retain reviewable versions.
+
+XLSX common formulas are recalculated from saved cells, across sheets and ranges. Unsupported
+functions/references/features block certification. DOCX/PDF use real tables; supported DOCX/PPTX
+content renders into page images. Office preview fidelity is bounded and not identical to native
+Word/PowerPoint. Exact-run Office text/cell edits preserve unrelated ZIP parts and refuse complex
+features. Supported formats and limits (available in the source repository).
+
+Source-only writing applies bounded deadline/year/recipient/commitment checks and preserves
+unspecified years; this is not a universal fact checker. Public research fetches supporting pages
+and records source URL/time/excerpts. Search failures remain explicit.
+
+There is no native computer control, authenticated browser automation, unrestricted shell or
+arbitrary dependency installation. JavaScript and Python execute within separate bounded runtimes.
+HTML previews support standalone offline apps; they cannot call the Gumee bridge or network.
 
 ## Data, updates, and removal
 
 Settings → Advanced shows the local data directory. It holds conversations, copied inputs,
 outputs, memory, skills, schedules, and checkpoints. Model requests go through OpenRouter;
 enabled research tools contact websites; approved connector calls contact their servers.
-There is no gumee cloud account or synchronization.
+Optional remote transfers and result synchronization use only the worker you configure. Personal local use needs no remote account.
 
 Deleting a task removes its copies and generated outputs inside gumee. Files exported elsewhere
 are unaffected. Back up the data directory while the app is closed if you want to preserve local
-history before an upgrade. Install updates manually; no automatic updater is included.
+history before an upgrade. Versioned migrations first create a consistent database backup. Signed updates are opt-in and verified before opening the system installer; release signing/feed setup is unavailable in this unsigned local build. See recovery and release setup (available in the source repository).
 
 Before uninstalling, choose **Disconnect** to remove the stored OpenRouter key and delete
 connectors to remove their stored tokens. Remove the application and, if desired, the data
