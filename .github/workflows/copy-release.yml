@@ -1,0 +1,42 @@
+name: Copy verified release assets
+on:
+  workflow_dispatch:
+    inputs:
+      manifest:
+        description: Signed source URLs, filenames and SHA256 checksums for the public installers
+        required: true
+      tag:
+        description: Destination draft release tag
+        required: true
+permissions:
+  contents: write
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download and verify installers
+        env:
+          ASSET_MANIFEST: ${{ inputs.manifest }}
+        run: |
+          python3 - <<'PYCODE'
+          import os,json,urllib.request,urllib.parse,pathlib,hashlib,concurrent.futures
+          pathlib.Path('assets').mkdir()
+          def copy(item):
+              name=item['name']
+              assert pathlib.Path(name).name == name
+              assert urllib.parse.urlparse(item['url']).hostname == 'release-assets.githubusercontent.com'
+              target=pathlib.Path('assets')/name
+              with urllib.request.urlopen(item['url']) as response, target.open('wb') as output:
+                  while block := response.read(1024*1024): output.write(block)
+              with target.open('rb') as source: actual=hashlib.file_digest(source,'sha256').hexdigest()
+              assert actual == item['sha256'], 'Checksum mismatch: '+name
+              print('Verified '+name)
+          with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
+              list(pool.map(copy,json.loads(os.environ['ASSET_MANIFEST'])))
+          PYCODE
+      - name: Attach verified assets to draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_REPO: ${{ github.repository }}
+        run: gh release upload "$RELEASE_TAG" assets/* --clobber --repo "$RELEASE_REPO"
